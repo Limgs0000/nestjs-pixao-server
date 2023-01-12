@@ -24,6 +24,7 @@ export class UsersController {
   @Get('test')
   test(@Req() req) {
     console.log(req);
+    return '콘솔확인 ㄱ';
   }
 
   @Get()
