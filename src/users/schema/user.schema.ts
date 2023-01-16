@@ -5,6 +5,7 @@ export type UserDocument = HydratedDocument<User>;
 
 const option: SchemaOptions = {
   timestamps: true,
+  // typeKey: '$type',
 };
 
 @Schema(option)

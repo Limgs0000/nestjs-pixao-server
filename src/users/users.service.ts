@@ -44,12 +44,28 @@ export class UsersService {
       user_id,
       email,
     };
+
     const createdUser = new this.userModel(dto);
     return createdUser.save();
   }
 
-  findOneUserById(user_id) {
-    // return this.userModel.findOne({ "user_id": user_id}).exec();
-    return '1';
+  async findOneUserById(user_id) {
+    try {
+      const aaa = {
+        user_id: user_id
+      };
+
+      const bbb = JSON.stringify(aaa);
+      console.log(user_id)
+      // const a = await this.userModel.find({ "user_id": user_id }).exec();
+      // const a = await this.userModel.findById(user_id);
+      const a = await this.userModel.findOne({ bbb }).exec();
+      console.log(a);
+      return a;
+
+    } catch (e) {
+      console.log(e);
+      return { err: e.message };
+    };
   }
 }
