@@ -7,10 +7,12 @@ import {
   Param,
   Delete,
   Req,
-} from '@nestjs/common';
+  Headers, Query
+} from "@nestjs/common";
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import * as jwt from 'jsonwebtoken';
 
 @Controller('users')
 export class UsersController {
@@ -21,19 +23,20 @@ export class UsersController {
     return this.usersService.createUser(createUserDto);
   }
 
-  @Get('test')
-  test(@Req() req) {
-    console.log(req);
-    return '콘솔확인 ㄱ';
+  @Post('google-login')
+  createUserWithGoogle(@Req() req) {
+    return this.usersService.createUserWithGoogle(
+      jwt.decode(req.headers['authorization']),
+    );
   }
 
-  @Get()
+  @Get('all')
   findAllUser() {
     return this.usersService.findAllUser();
   }
 
   @Get()
-  findOneUserById(id: number) {
-    return `This action returns a #${id} user`;
+  findOneUserById(@Query() user_id) {
+    return this.usersService.findOneUserById(user_id);
   }
 }

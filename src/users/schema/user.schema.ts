@@ -10,13 +10,16 @@ const option: SchemaOptions = {
 @Schema(option)
 export class User extends Document {
   @Prop()
+  user_id: string;
+
+  @Prop()
   name: string;
 
   @Prop()
   email: string;
 
   @Prop()
-  password: string;
+  picture: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
