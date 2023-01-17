@@ -51,21 +51,24 @@ export class UsersService {
 
   async findOneUserById(user_id) {
     try {
-      const aaa = {
-        user_id: user_id
+      const userId = {
+        user_id,
       };
 
-      const bbb = JSON.stringify(aaa);
-      console.log(user_id)
-      // const a = await this.userModel.find({ "user_id": user_id }).exec();
-      // const a = await this.userModel.findById(user_id);
-      const a = await this.userModel.findOne({ bbb }).exec();
-      console.log(a);
-      return a;
-
+      const postData = JSON.stringify(userId);
+      const preData = await this.userModel.findOne({ postData });
+      console.log(preData);
+      const resultData = {
+        result: {
+          resultCode: 'Y',
+          resultMessage: 'api 호출 성공',
+        },
+        content: preData,
+      };
+      return resultData;
     } catch (e) {
       console.log(e);
       return { err: e.message };
-    };
+    }
   }
 }
