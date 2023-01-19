@@ -31,6 +31,13 @@ export class UsersController {
     );
   }
 
+  @Patch(':userId')
+  patchUserName(@Param() userId: string, @Body() name: string) {
+    console.log(userId, name);
+    console.log(typeof userId, typeof name);
+    return this.usersService.patchUserName(userId, name);
+  }
+
   @Get('all')
   findAllUser() {
     return this.usersService.findAllUser();
@@ -39,5 +46,14 @@ export class UsersController {
   @Get()
   findOneUserById(@Query() user_id) {
     return this.usersService.findOneUserById(user_id);
+  }
+
+  @Post('updateFcmToken')
+  createOrUpdateFcmToken(
+    @Body('userKey') userKey: string,
+    @Body('fcmToken') fcmToken: string,
+  ) {
+    console.log(userKey, fcmToken);
+    return this.usersService.createOrUpdateFcmToken(userKey, fcmToken);
   }
 }

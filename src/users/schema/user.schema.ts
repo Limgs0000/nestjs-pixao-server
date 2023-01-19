@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
-import { Document, HydratedDocument } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -9,7 +9,7 @@ const option: SchemaOptions = {
 };
 
 @Schema(option)
-export class User extends Document {
+export class User {
   @Prop()
   user_id: string;
 
@@ -21,6 +21,9 @@ export class User extends Document {
 
   @Prop()
   picture: string;
+
+  @Prop()
+  fcm_user_token: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
