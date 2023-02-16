@@ -71,4 +71,58 @@ export class UsersService {
       return { err: e.message };
     }
   }
+
+  async patchUserName(userId, userName) {
+    try {
+      // console.log(userId.userId, userName);
+      const user_id = JSON.stringify(userId);
+      const name = JSON.stringify(userName);
+
+      console.log(user_id, name);
+      const data = await this.userModel.updateOne(
+        { user_id: user_id },
+        { name: name },
+      );
+      const resultData = {
+        result: {
+          resultCode: 'Y',
+          resultMessage: 'api 호출 성공',
+        },
+        content: data,
+      };
+      return resultData;
+    } catch (e) {
+      console.log(e);
+      return { err: e.message };
+    }
+  }
+
+  async createOrUpdateFcmToken(userKey: string, fcmToken: string) {
+    try {
+      const data_user_id = userKey;
+      const token = fcmToken;
+      const data = await this.userModel.updateOne(
+        {
+          user_id: data_user_id,
+        },
+        {
+          fcm_user_token: token,
+        },
+        {
+          upsert: true,
+        },
+      );
+
+      const resultData = {
+        result: {
+          resultCode: 'Y',
+          resultMessage: 'api 호출 성공',
+        },
+        content: data,
+      };
+      return resultData;
+    } catch (e) {
+      return { err: e.message };
+    }
+  }
 }
