@@ -1,0 +1,28 @@
+/**
+* Paste one or more documents here
+*/
+{
+  "_id": {
+    "$oid": "63e75aaebd55c52a348373fc"
+  },
+  "member": {
+    ObjectID(),
+    ObjectID()
+  },
+  "chat": [
+    {
+      _id: objectid(),
+      send_user: userobjectID(),
+      data: "반가워요!",
+      type: "text",
+      createdAt: ISODATE(2312312312123)
+    },
+    {
+      _id: objectid(),
+      send_user: userobjectID(),
+      data: "안녕하세요.",
+      type: "text",
+      createdAt: ISODATE(2312312312123)
+    }
+  ]
+}

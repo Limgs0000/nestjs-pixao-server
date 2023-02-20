@@ -1,0 +1,4 @@
+1. 채팅방 들어옴 -> join
+2. 메세지 발송시 sendMessage 에다가 데이터를 서버에 emit -> 서버에서 db에 저장 -> 서버에서 receiveMessage 에다가가 data 전달
+3.
+3. 채팅방 떠날떄 -> leave
