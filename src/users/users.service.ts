@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schema/user.schema';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
@@ -37,7 +37,9 @@ export class UsersService {
   // }
 
   createUserWithGoogle(token) {
+    console.log(token);
     const { name, picture, user_id, email } = token;
+
     const dto = {
       name,
       picture,
@@ -49,14 +51,9 @@ export class UsersService {
     return createdUser.save();
   }
 
-  async findOneUserById(user_id) {
+  async findOneUserById(_id: ObjectId) {
     try {
-      const userId = {
-        user_id,
-      };
-
-      const postData = JSON.stringify(userId);
-      const preData = await this.userModel.findOne({ postData });
+      const preData = await this.userModel.findById(_id);
       console.log(preData);
       const resultData = {
         result: {
@@ -124,5 +121,84 @@ export class UsersService {
     } catch (e) {
       return { err: e.message };
     }
+  }
+
+  async addFriend(requestUserEmail: string, receiveUserEmail: string) {
+    try {
+      const requestUserObjectId = await this.userModel.findOne(
+        {
+          email: requestUserEmail,
+        },
+        {
+          _id: 1,
+        },
+      );
+      if (requestUserObjectId == null) {
+        const result = {
+          result: {
+            resultCode: 'N',
+            resultMessage: '잘못된 요청자 이메일 입니다.',
+          },
+        };
+
+        return result;
+      }
+
+      const receiveUserObjectId = await this.userModel.findOne(
+        {
+          email: receiveUserEmail,
+        },
+        {
+          _id: 1,
+        },
+      );
+      if (receiveUserObjectId === null) {
+        const result = {
+          result: {
+            resultCode: 'N',
+            resultMessage: '잘못된 수신자 이메일 입니다.',
+          },
+        };
+
+        return result;
+      }
+
+      const data1 = await this.userModel.updateOne(
+        {
+          _id: requestUserObjectId,
+        },
+        {
+          $push: {
+            friends: {
+              _id: receiveUserObjectId._id.toHexString(),
+              createdAt: new Date(),
+            },
+          },
+        },
+      );
+
+      const data2 = await this.userModel.updateOne(
+        {
+          _id: receiveUserObjectId,
+        },
+        {
+          $push: {
+            friends: {
+              _id: requestUserObjectId._id.toHexString(),
+              createdAt: new Date(),
+            },
+          },
+        },
+      );
+
+      const result = {
+        result: {
+          resultCode: 'Y',
+          resultMessage: '친구 추가 완료.',
+        },
+      };
+
+      return result;
+    } catch (err) {}
   }
 }

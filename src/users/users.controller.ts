@@ -14,6 +14,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as jwt from 'jsonwebtoken';
+import { ObjectId } from 'mongoose';
 
 @Controller('users')
 export class UsersController {
@@ -43,9 +44,9 @@ export class UsersController {
     return this.usersService.findAllUser();
   }
 
-  @Get()
-  findOneUserById(@Query() user_id) {
-    return this.usersService.findOneUserById(user_id);
+  @Get('one')
+  findOneUserById(@Body('_id') _id: ObjectId) {
+    return this.usersService.findOneUserById(_id);
   }
 
   @Post('updateFcmToken')
@@ -55,5 +56,13 @@ export class UsersController {
   ) {
     console.log(userKey, fcmToken);
     return this.usersService.createOrUpdateFcmToken(userKey, fcmToken);
+  }
+
+  @Post('addFriend')
+  addFriend(
+    @Body('requestUserEmail') requestUserEmail: string,
+    @Body('receiveUserEmail') receiveUserEmail: string,
+  ): any {
+    return this.usersService.addFriend(requestUserEmail, receiveUserEmail);
   }
 }
