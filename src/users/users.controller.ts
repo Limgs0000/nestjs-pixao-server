@@ -45,8 +45,8 @@ export class UsersController {
   }
 
   @Get('one')
-  findOneUserById(@Body('_id') _id: ObjectId) {
-    return this.usersService.findOneUserById(_id);
+  findOneUserById(@Body('userId') userId: string) {
+    return this.usersService.findOneUserById(userId);
   }
 
   @Post('updateFcmToken')
@@ -64,5 +64,23 @@ export class UsersController {
     @Body('receiveUserEmail') receiveUserEmail: string,
   ): any {
     return this.usersService.addFriend(requestUserEmail, receiveUserEmail);
+  }
+
+  @Post('myFriends')
+  getMyFriendsAll(@Body('userId') userId: ObjectId) {
+    return this.usersService.getMyFriendsAll(userId);
+  }
+
+  @Post('addMyComment')
+  addMyComment(
+    @Body('userId') userId: ObjectId,
+    @Body('comment') comment: string,
+  ) {
+    return this.usersService.addMyComment(userId, comment);
+  }
+
+  @Get('myComment')
+  findMyCommentWithUserId(@Body('userId') userId: string) {
+    return this.usersService.findMyCommentWithUserId(userId);
   }
 }

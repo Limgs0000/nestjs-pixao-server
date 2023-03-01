@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schema/user.schema';
 import { Model, ObjectId } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
+import { stringify } from 'ts-jest';
 
 @Injectable()
 export class UsersService {
@@ -14,8 +15,17 @@ export class UsersService {
     return createdUser.save();
   }
 
-  async findAllUser(): Promise<User[]> {
-    return this.userModel.find().exec();
+  async findAllUser(): Promise<any> {
+    const data = await this.userModel.find().exec();
+    const resultData = {
+      result: {
+        resultCode: 'Y',
+        resultMessage: 'api 호출 성공',
+        content: data,
+      },
+    };
+
+    return resultData;
   }
 
   // async createUserWithGoogleAuth(token): Promise<User> {
@@ -36,9 +46,28 @@ export class UsersService {
   //   return email;
   // }
 
-  createUserWithGoogle(token) {
-    console.log(token);
+  async createUserWithGoogle(token) {
+    // console.log(token);
     const { name, picture, user_id, email } = token;
+
+    // db에 해당 유저 있는지 체크
+    const test = await this.userModel.findOne({
+      email,
+    });
+
+    console.log(test);
+
+    if (test !== null) {
+      const resultData = {
+        result: {
+          resultCode: 'N',
+          resultMessage: '이미 존재하는 이메일입니다.',
+          content: test,
+        },
+      };
+
+      return resultData;
+    }
 
     const dto = {
       name,
@@ -51,16 +80,17 @@ export class UsersService {
     return createdUser.save();
   }
 
-  async findOneUserById(_id: ObjectId) {
+  async findOneUserById(userId: string) {
     try {
-      const preData = await this.userModel.findById(_id);
+      console.log(userId);
+      const preData = await this.userModel.findOne({ _id: userId });
       console.log(preData);
       const resultData = {
         result: {
           resultCode: 'Y',
           resultMessage: 'api 호출 성공',
+          content: preData,
         },
-        content: preData,
       };
       return resultData;
     } catch (e) {
@@ -163,33 +193,42 @@ export class UsersService {
         return result;
       }
 
-      const data1 = await this.userModel.updateOne(
+      const isAlreadyFriendWithReqUserObjectId = await this.userModel.findOne(
         {
-          _id: requestUserObjectId,
+          _id: requestUserObjectId._id,
         },
-        {
-          $push: {
-            friends: {
-              _id: receiveUserObjectId._id.toHexString(),
-              createdAt: new Date(),
-            },
-          },
-        },
+        { friends: 1 },
       );
 
-      const data2 = await this.userModel.updateOne(
-        {
-          _id: receiveUserObjectId,
-        },
-        {
-          $push: {
-            friends: {
-              _id: requestUserObjectId._id.toHexString(),
-              createdAt: new Date(),
-            },
-          },
-        },
-      );
+      console.log(isAlreadyFriendWithReqUserObjectId);
+
+      // const data1 = await this.userModel.updateOne(
+      //   {
+      //     _id: requestUserObjectId,
+      //   },
+      //   {
+      //     $push: {
+      //       friends: {
+      //         _id: receiveUserObjectId._id.toHexString(),
+      //         createdAt: new Date(),
+      //       },
+      //     },
+      //   },
+      // );
+      //
+      // const data2 = await this.userModel.updateOne(
+      //   {
+      //     _id: receiveUserObjectId,
+      //   },
+      //   {
+      //     $push: {
+      //       friends: {
+      //         _id: requestUserObjectId._id.toHexString(),
+      //         createdAt: new Date(),
+      //       },
+      //     },
+      //   },
+      // );
 
       const result = {
         result: {
@@ -200,5 +239,92 @@ export class UsersService {
 
       return result;
     } catch (err) {}
+  }
+
+  async getMyFriendsAll(userId) {
+    try {
+      const friendsList = await this.userModel.findById(userId, {
+        friends: 1,
+      });
+      // console.log('friendsList', friendsList);
+      const rtnArr = [];
+      // let retFriendsList = friendsList.friends.map(async (elem) => {
+      //   const data = await this.userModel.findById(elem['_id']);
+      //   console.log(data);
+      //   return data;
+      // });
+
+      const friendsArr = friendsList['friends'];
+
+      console.log(friendsArr);
+
+      // for (let i = 0; i < friendsArr.length; i++) {}
+
+      for (const elem of friendsArr) {
+        const data = await this.userModel.findById(elem['_id'], {
+          _id: 1,
+          name: 1,
+          email: 1,
+          picture: 1,
+          comment: 1,
+        });
+        rtnArr.push(data);
+      }
+
+      // const result = {
+      //   resultCode: 'Y',
+      //   resultMessage: '모든 친구 조회 완료.',
+      //   friends: rtnArr,
+      // };
+
+      const resultData = {
+        result: {
+          resultCode: 'Y',
+          resultMessage: '모든 친구 조회 완료.',
+          content: rtnArr,
+        },
+      };
+
+      return resultData;
+    } catch (e) {}
+  }
+
+  async addMyComment(userId: ObjectId, comment: string) {
+    try {
+      const addComment = await this.userModel.updateOne(
+        { _id: userId },
+        { comment },
+        { upsert: true },
+      );
+
+      const result = {
+        resultCode: 'Y',
+        resultMessage: '커멘트 입력/업데이트 완료.',
+      };
+
+      return result;
+    } catch (e) {}
+  }
+
+  async findMyCommentWithUserId(userId: string) {
+    const userInfo = await this.userModel.findOne(
+      {
+        _id: userId,
+      },
+      {
+        _id: 0,
+        comment: 1,
+      },
+    );
+
+    const result = {
+      resultCode: 'Y',
+      resultMessage: '커멘트 조회 완료.',
+      content: {
+        comment: userInfo.comment,
+      },
+    };
+
+    return result;
   }
 }

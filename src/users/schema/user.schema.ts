@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory, SchemaOptions } from '@nestjs/mongoose';
 import { HydratedDocument, ObjectId } from 'mongoose';
 import * as mongoose from 'mongoose';
+import requireActual = jest.requireActual;
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -35,6 +36,13 @@ export class User {
   })
   friends: string[];
 
+  @Prop()
+  comment: string;
+
+  @Prop({
+    require: true,
+  })
+  rooms: string[];
   // @Prop({
   //   type: {
   //     _id: {

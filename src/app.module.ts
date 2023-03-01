@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { EventsModule } from './events/events.module';
+import { RoomsModule } from './rooms/rooms.module';
 import * as process from 'process';
 
 @Module({
@@ -19,6 +20,7 @@ import * as process from 'process';
     UsersModule,
     AuthModule,
     EventsModule,
+    RoomsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
